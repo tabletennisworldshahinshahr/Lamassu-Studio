@@ -26,17 +26,24 @@ const App: React.FC = () => {
       try {
         // Ensure window.aistudio and the method exist before calling
         if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
-          const hasKey = await window.aistudio.hasSelectedApiKey();
+          // FIX: The original API key check could hang indefinitely, causing the app to get stuck
+          // on the loading screen. By racing the check against a 2-second timeout, we ensure
+          // the application always proceeds.
+          const keyCheckPromise = window.aistudio.hasSelectedApiKey();
+          const timeoutPromise = new Promise<boolean>((_, reject) =>
+            setTimeout(() => reject(new Error('API key check timed out')), 2000)
+          );
+
+          const hasKey = await Promise.race([keyCheckPromise, timeoutPromise]);
           setIsKeySelected(hasKey);
         } else {
           // If aistudio is not available, proceed as if no key is selected.
-          // This allows the app to run in environments where aistudio is not present.
           console.warn("window.aistudio is not available.");
           setIsKeySelected(false);
         }
       } catch (error) {
-        console.error("Error checking for API key:", error);
-        // In case of an error, assume no key is selected to be safe.
+        console.error("Error or timeout checking for API key:", error);
+        // In case of an error or timeout, assume no key is selected to be safe.
         setIsKeySelected(false);
       } finally {
         // This is crucial to ensure the loading screen is always removed.
