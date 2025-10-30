@@ -194,9 +194,9 @@ export const Header: React.FC = () => {
         )}
 
         <div className="py-16 md:py-24 text-center">
-          <h1 className="font-display text-3xl md:text-5xl text-white tracking-wider">
+          <p className="font-display text-3xl md:text-5xl text-white tracking-wider">
             ویدیوگرافی | تیزرتبلیغاتی | تولیدمحتوا | عکاسی
-          </h1>
+          </p>
         </div>
       </div>
     </header>

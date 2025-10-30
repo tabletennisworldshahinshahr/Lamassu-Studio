@@ -23,14 +23,25 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkApiKey = async () => {
-      if (window.aistudio) {
-        const hasKey = await window.aistudio.hasSelectedApiKey();
-        setIsKeySelected(hasKey);
-      } else {
-        console.warn("window.aistudio is not available.");
+      try {
+        // Ensure window.aistudio and the method exist before calling
+        if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
+          const hasKey = await window.aistudio.hasSelectedApiKey();
+          setIsKeySelected(hasKey);
+        } else {
+          // If aistudio is not available, proceed as if no key is selected.
+          // This allows the app to run in environments where aistudio is not present.
+          console.warn("window.aistudio is not available.");
+          setIsKeySelected(false);
+        }
+      } catch (error) {
+        console.error("Error checking for API key:", error);
+        // In case of an error, assume no key is selected to be safe.
         setIsKeySelected(false);
+      } finally {
+        // This is crucial to ensure the loading screen is always removed.
+        setIsChecking(false);
       }
-      setIsChecking(false);
     };
 
     checkApiKey();
@@ -173,7 +184,7 @@ const App: React.FC = () => {
             <div className="border-t border-white/10 bg-black/20">
                 <div className="container mx-auto px-6 sm:px-8 h-12 flex justify-center items-center text-sm">
                     <p className="text-white/70 text-xs sm:text-sm">
-                        کلیه حقوق متعلق به استودیو لامآسو می باشد. © ۱۴۰۴
+                        کلیه حقوق متعلق به استودیو لامآسو می باشد. © ۱۴۰۳
                     </p>
                 </div>
             </div>
